@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { FakedataContext } from "../../App";
 import { bookingStyle } from "./BookingStyle";
+import Maps from "../Map/Maps";
 
 const Booking = () => {
   // calling fake data from context
@@ -17,7 +18,7 @@ const Booking = () => {
 
   return (
     <Container className={`container ${classes.bookingContainer}`}>
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item md={6} xm={12}>
           <Paper component="div" className={classes.hotelContainer}>
             <Typography variant="h6" display="block" gutterBottom>
@@ -67,7 +68,9 @@ const Booking = () => {
             ))}
           </Paper>
         </Grid>
-        <Grid item md={6} xm={12}></Grid>
+        <Grid item md={6} xm={12}>
+          <Maps />
+        </Grid>
       </Grid>
     </Container>
   );
