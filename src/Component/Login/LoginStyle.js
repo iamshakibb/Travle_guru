@@ -47,4 +47,8 @@ export const LoginStyle = makeStyles({
     color: "salmon",
     paddingBottom: "5px",
   },
+
+  success: {
+    color: "green",
+  },
 });

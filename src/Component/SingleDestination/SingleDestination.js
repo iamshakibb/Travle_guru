@@ -11,18 +11,27 @@ const SingleDestination = () => {
   const allDestination = data.destinations;
   const targetDestination = allDestination.find((destination) => destination.name === name);
   const history = useHistory();
-  let inputvalue = "";
+  let locationValue = "";
+  let fromDateValue = "";
+  let toDateValue = "";
 
-  const change = (e) => {
-    inputvalue = e.target.value;
+  const LocationChange = (e) => {
+    locationValue = e.target.value;
   };
-  const gotoBooking = () => {
+  const FromDateChange = (e) => {
+    fromDateValue = e.target.value;
+  };
+  const ToDateChange = (e) => {
+    toDateValue = e.target.value;
+  };
+  const gotoBooking = (e) => {
     const bookPath = `/booking/${name}/hotel`;
-    if (inputvalue.length === 0) {
-      history.push();
-    } else {
+    if (locationValue !== "" && fromDateValue !== "" && toDateValue.length !== "") {
       history.push(bookPath);
+    } else {
+      history.push();
     }
+    e.preventDefault();
   };
   return (
     <Container className={classes.SingleDestinationContianer}>
@@ -34,14 +43,14 @@ const SingleDestination = () => {
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
-          <form className={classes.root} autoComplete="off">
+          <form className={classes.root} onSubmit={gotoBooking}>
             <Paper component="div" className={classes.formContainer}>
               <Typography variant="caption" display="block" gutterBottom className={classes.title}>
                 Origin
               </Typography>
               <TextField
                 className={classes.input}
-                onChange={change}
+                onChange={LocationChange}
                 required
                 type="text"
                 label="Your location"
@@ -65,16 +74,32 @@ const SingleDestination = () => {
                   <Typography variant="caption" display="block" gutterBottom className={classes.title}>
                     From
                   </Typography>
-                  <TextField className={classes.input} required variant="outlined" type="date" format="yyyy-MM-dd" name="From Date" />
+                  <TextField
+                    className={classes.input}
+                    required
+                    variant="outlined"
+                    onChange={FromDateChange}
+                    type="date"
+                    format="yyyy-MM-dd"
+                    name="From Date"
+                  />
                 </Grid>
                 <Grid item xm={6}>
                   <Typography variant="caption" display="block" gutterBottom className={classes.title}>
                     To
                   </Typography>
-                  <TextField className={classes.input} required variant="outlined" format="yyyy-MM-dd" type="date" name="To Data" />
+                  <TextField
+                    className={classes.input}
+                    onChange={ToDateChange}
+                    required
+                    variant="outlined"
+                    format="yyyy-MM-dd"
+                    type="date"
+                    name="To Data"
+                  />
                 </Grid>
                 <Grid item xm={12}>
-                  <Button variant="contained" type="submit" onClick={gotoBooking} className={`logInBtn ${classes.StartBookingBtn} `}>
+                  <Button variant="contained" type="submit" className={`logInBtn ${classes.StartBookingBtn} `}>
                     Start Booking
                   </Button>
                 </Grid>

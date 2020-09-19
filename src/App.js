@@ -1,7 +1,10 @@
 import React, { createContext, useState } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import "./App.css";
+import Blog from "./Component/Blog/Blog";
 import Booking from "./Component/Booking/Booking";
+import Contact from "./Component/Contact/Contact";
+import Destination from "./Component/Destination/Destination";
 import Home from "./Component/Home/Home";
 import Login from "./Component/Login/Login";
 import NavBar from "./Component/NavBar/NavBar";
@@ -20,6 +23,10 @@ function App() {
     name: "",
     email: "",
     photoURL: "",
+    success: false,
+    password: "",
+    rePassword: "",
+    signupError: "",
   });
   return (
     <UserInfoContext.Provider value={{ userInfo, setUserInfo }}>
@@ -39,9 +46,15 @@ function App() {
             <Route path="/login">
               <Login />
             </Route>
-            {/* <Route path="/booking/:name/hotel">
-              <Booking />
-            </Route> */}
+            <Route path="/destination">
+              <Destination />
+            </Route>
+            <Route path="/blog">
+              <Blog />
+            </Route>
+            <Route path="/contact">
+              <Contact />
+            </Route>
             <PrivateRouter path="/booking/:name/hotel">
               <Booking />
             </PrivateRouter>

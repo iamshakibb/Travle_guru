@@ -29,11 +29,13 @@ const Login = () => {
       .auth()
       .signInWithPopup(provider)
       .then(function (result) {
-        const { displayName, photoURL, email } = result.user;
+        const newuser = { ...userInfo };
+        newuser.signupError = "";
+        setUserInfo(newuser);
+        const { displayName, email } = result.user;
         const info = {
           islogin: true,
           name: displayName,
-          photo: photoURL,
           email: email,
         };
         setUserInfo(info);
@@ -59,11 +61,14 @@ const Login = () => {
       .auth()
       .signInWithPopup(provider)
       .then(function (result) {
-        const { displayName, email } = result.user;
+        const newuser = { ...userInfo };
+        newuser.signupError = "";
+        setUserInfo(newuser);
+        const { displayName } = result.user;
         const info = {
           islogin: true,
           name: displayName,
-          email: email,
+          email: result.additionalUserInfo.profile.email,
         };
         setUserInfo(info);
         history.replace(from);
@@ -81,44 +86,62 @@ const Login = () => {
   };
   //facebook login
 
-  const [isvalid, setIsvalid] = useState(true);
+  // Password and email validation
+  const [isvalid, setIsvalid] = useState(false);
   /* eslint-disable */
   const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
   const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
   /* eslint-enable*/
+
+  const validdation = () => {
+    if (passwordRegex.test(userInfo.password) && emailRegex.test(userInfo.email)) {
+      if (userInfo.password === userInfo.rePassword) {
+        setIsvalid(true);
+        userInfo.signupError = "";
+      } else {
+        setUserInfo({ ...userInfo, signupError: "You Password didn't match " });
+      }
+    } else {
+      setUserInfo({ ...userInfo, signupError: "You password or Email didn't meet with our condition" });
+    }
+  };
+  // Password and email validation
+
   // setting the state is create account from open or not
   const [isCreateAccounntOpen, setIsCreateAccountOpen] = useState(true);
+
+  // signUp or login with email and password
   const handleFormSubmit = (e) => {
-    if (isCreateAccounntOpen === true) {
+    e.preventDefault();
+    if (isCreateAccounntOpen === true && isvalid === true) {
       firebase
         .auth()
         .createUserWithEmailAndPassword(userInfo.email, userInfo.password)
         .then(() => {
+          userInfo.success = true;
           const newuser = { ...userInfo };
           newuser.signupError = "";
           setUserInfo(newuser);
           const user = firebase.auth().currentUser;
 
-          user
-            .updateProfile({
-              displayName: userInfo.name,
-            })
-            .then(function () {
-              // Update successful.
-            })
-            .catch(function (error) {
-              // An error happened.
-            });
+          user.updateProfile({
+            displayName: userInfo.name,
+          });
         })
         .catch(function (error) {
+          userInfo.success = true;
           const errorMessage = error.message;
           setUserInfo({ ...userInfo, signupError: errorMessage });
         });
-    } else {
+    }
+    if (isCreateAccounntOpen === false) {
       firebase
         .auth()
         .signInWithEmailAndPassword(userInfo.email, userInfo.password)
         .then((res) => {
+          const newuser = { ...userInfo };
+          newuser.signupError = "";
+          setUserInfo(newuser);
           const { displayName, email } = res.user;
           const info = {
             islogin: true,
@@ -139,9 +162,9 @@ const Login = () => {
           console.log(errorMessage);
         });
     }
-    e.preventDefault();
   };
 
+  // conditon for which form are open
   const showCreateForm = () => {
     setIsCreateAccountOpen(true);
     const newuser = { ...userInfo };
@@ -152,9 +175,9 @@ const Login = () => {
     setIsCreateAccountOpen(false);
     const newuser = { ...userInfo };
     newuser.signupError = "";
+    newuser.success = "";
     setUserInfo(newuser);
   };
-  // setting the state is create account from open or not
 
   // is password input focus or not to show the message
   const [isFocus, setIsFocus] = useState(false);
@@ -173,6 +196,13 @@ const Login = () => {
                 <Typography variant="caption" display="block" gutterBottom className={classes.message}>
                   {userInfo.signupError}
                 </Typography>
+
+                {userInfo.success === true ? (
+                  <Typography className={classes.success} variant="h5" display="block" gutterBottom>
+                    Account created successfully
+                  </Typography>
+                ) : null}
+
                 {isCreateAccounntOpen === true ? (
                   <Typography variant="h5" display="block" gutterBottom>
                     Create an account
@@ -182,6 +212,7 @@ const Login = () => {
                     LogIn
                   </Typography>
                 )}
+
                 <form onSubmit={handleFormSubmit}>
                   {isCreateAccounntOpen === true ? (
                     <TextField
@@ -203,8 +234,8 @@ const Login = () => {
                     type="email"
                     className={classes.input}
                     onBlur={(event) => {
-                      const newuser = { ...userInfo, email: event.target.value };
-                      setUserInfo(newuser);
+                      userInfo.email = event.target.value;
+                      validdation();
                     }}
                     label="Email"
                     variant="outlined"
@@ -227,9 +258,9 @@ const Login = () => {
                     required
                     fullWidth
                     onBlur={(event) => {
-                      const newuser = { ...userInfo, password: event.target.value };
-                      setUserInfo(newuser);
+                      userInfo.password = event.target.value;
                       setIsFocus(false);
+                      validdation();
                     }}
                     onFocus={handlePasswordMessage}
                   />
@@ -244,8 +275,8 @@ const Login = () => {
                       required
                       fullWidth
                       onBlur={(event) => {
-                        const newuser = { ...userInfo, rePassword: event.target.value };
-                        setUserInfo(newuser);
+                        userInfo.rePassword = event.target.value;
+                        validdation();
                       }}
                     />
                   ) : null}
